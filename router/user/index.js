@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const {userController} = require('../../controller');
+const {userController} = require('../../service');
 const passport = require('passport');
 
 const initializePassport = require('../../passport-config');
-const { updateProfile } = require('../../controller/userController');
+const { updateProfile } = require('../../service/userService');
 
    initializePassport(
   passport,

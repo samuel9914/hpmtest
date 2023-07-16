@@ -39,7 +39,7 @@ POST http://localhost:3000/users/register
 Content-Type:  application/json
 
 {
-    "username":"adaHurufBesarDanKecil",
+    "username":"2adaHurufBesarDanKecil",
     "password":"AWDAWDawdawd123"
 }
 
@@ -51,8 +51,8 @@ POST http://localhost:3000/users/login
 Content-Type:  application/json
 
 {
-    "username":"ridho",
-    "password":"mapres"
+    "username":"adaHurufBesarDanKecil",
+    "password":"AWDAWDawdawd123"
 }
 
 ###harusnya berhasil
@@ -60,7 +60,7 @@ PUT http://localhost:3000/users/updateProfile
 Content-Type:  application/json
 
 {
-    "username":"ridho",
+    "username":"adaHurufBesarDanKecil",
     "email":"mapres",
     "gender":"male",
     "name": "test"

@@ -1,2 +1,0 @@
-- install NPM latest
-- install node.js v 18

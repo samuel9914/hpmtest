@@ -1,4 +1,4 @@
-const {models:{User,UserProfile}} = require('../model');
+const {models:{User,UserProfile}} = require('../config');
 
 
 const bcrypt = require('bcrypt');
@@ -116,7 +116,7 @@ module.exports = {
             
             const salt = await bcrypt.genSalt(10)
             const hashedPassword = await bcrypt.hash(password,salt) 
-            // console.log(salt)
+             console.log(salt)
             console.log(hashedPassword)
             
             await User.create({
