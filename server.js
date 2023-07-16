@@ -6,13 +6,13 @@ const express = require('express');
 const app = express();
 const bcrypt = require('bcrypt');
 const sequelize = require("sequelize");
-const db = require('./model');
+const db = require('./config');
 const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
-const userRouter = require('./route/user');
+const userRouter = require('./router/user');
 
-const {models:{User}} = require('./model');
+const {models:{User}} = require('./config');
 
 /* const initializePassport = require('./passport-config');
 
