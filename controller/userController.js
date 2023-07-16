@@ -1,6 +1,11 @@
 const {models:{User}} = require('../model');
 
+
 const bcrypt = require('bcrypt');
+
+
+
+
 
 module.exports = {
 
@@ -41,6 +46,7 @@ module.exports = {
 
     },
 
+    
     login: async(req,res) => {
 
         const username = req.body.username;
@@ -60,7 +66,7 @@ module.exports = {
         } catch{
             res.status(500).send()
         } 
-
+        
 
     }
 
