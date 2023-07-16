@@ -15,6 +15,34 @@ Content-Type:  application/json
     "password":"mapres"
 }
 
+### TIDAK ADA HURUF BESAR
+POST http://localhost:3000/users/register
+Content-Type:  application/json
+
+{
+    "username":"tanpaHurufBesar",
+    "password":"awdawdawdawd"
+}
+
+
+#### TIDAK ADA HURUF KECIL
+POST http://localhost:3000/users/register
+Content-Type:  application/json
+
+{
+    "username":"tanpaHurufKecil",
+    "password":"AWDAWDAWD"
+}
+
+#### BERHASIL REGISTRASI
+POST http://localhost:3000/users/register
+Content-Type:  application/json
+
+{
+    "username":"adaHurufBesarDanKecil",
+    "password":"AWDAWDawdawd123"
+}
+
 
 ###
 
