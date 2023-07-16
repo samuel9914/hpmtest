@@ -1,6 +1,9 @@
 GET http://localhost:3000/users
 
 
+###
+GET http://localhost:3000/users/profiles
+
 
 ###
 
@@ -22,4 +25,15 @@ Content-Type:  application/json
 {
     "username":"ridho",
     "password":"mapres"
+}
+
+###harusnya berhasil
+PUT http://localhost:3000/users/updateProfile
+Content-Type:  application/json
+
+{
+    "username":"ridho",
+    "email":"mapres",
+    "gender":"male",
+    "name": "test"
 }

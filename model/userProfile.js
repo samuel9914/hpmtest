@@ -1,14 +1,14 @@
 module.exports = (sequilize, DataTypes) =>{
 
-    const User = sequilize.define(  'user',
-                                    {
+    const UserProfiles = sequilize.define(  'userProfile',
+                                    {   name:DataTypes.STRING,
                                         username: DataTypes.STRING,
-                                        password: DataTypes.STRING
-                                  
+                                        email: DataTypes.STRING,
+                                        gender: DataTypes.STRING
                                     },
                                     {
                                         freezeTableName: true
                                     })
 
-    return User;
+    return UserProfiles;
 };
