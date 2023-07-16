@@ -34,21 +34,17 @@ module.exports = {
         
         console.log(req.body);
         if(req.body.email==null || req.body.email=='' ){
-            console.log('inside update profile1');
             res.status(409).send("Email tidak boleh kosong")
 
         }
         if(req.body.name==null || req.body.name=='' ){
-            console.log('inside update profile2');
             res.status(409).send("nama tidak boleh kosong")
 
         }
         if(req.body.gender==null || req.body.gender=='' ){
-            console.log('inside update profile3');
             res.status(409).send("gender tidak boleh kosong")
         }
         if(req.body.gender.toLowerCase() != 'male' && req.body.gender.toLowerCase() != 'female' ){
-            console.log('inside update profile4');
             res.status(409).send("gender harus male atau female")
         }
 
@@ -87,39 +83,65 @@ module.exports = {
 
     create: async(req,res) => {
 
-        if(req.body.username && req.body.password){
-
-            const { username, password} = req.body;
-            console.log('executed controller');
-            try {
-                const salt = await bcrypt.genSalt(10)
-                const hashedPassword = await bcrypt.hash(password,salt) 
-               // console.log(salt)
-                console.log(hashedPassword)
-                
-                await User.create({
-                    username,
-                    password: hashedPassword
-                });
+        const { username, password} = req.body;
 
 
-                await UserProfile.create({
-                    name:'',
-                    username,
-                    email:'',
-                    gender:''
-                    
+        if(!username || !password || username.trim() == '' || password.trim() == ''){
+            return res.status(409).send("username dan password tidak boleh kosong");
+        }
 
-                });
 
-                res.status(201).send()
-            
-              }
-              catch{
-                res.status(500).send()
-              }
+        if(password.length <= 8){
+            return res.status(409).send("password harus lebih dari 8 karakter");
+        }
+           else if(/^[A-Z]+$/.test(password) ){
+            return res.status(409).send("password harus mengandung huruf kecil");
 
         }
+        else if(/^[a-z]+$/.test(password) ){
+            return res.status(409).send("password harus mengandung huruf kapital");
+
+        } 
+        else if(!/\d/.test(password)){
+            return res.status(409).send("password harus mengandung angka");
+        }
+       // (?=.*\d)(?=.*[a-z])(?=.*[A-Z])
+      
+
+        const user = await User.findOne({where : {username: username}})
+        if(user != null){
+            return res.status(409).send("username sudah digunakan");
+        }
+        try {
+            
+            const salt = await bcrypt.genSalt(10)
+            const hashedPassword = await bcrypt.hash(password,salt) 
+            // console.log(salt)
+            console.log(hashedPassword)
+            
+            await User.create({
+                username,
+                password: hashedPassword
+            });
+
+
+            await UserProfile.create({
+                name:'',
+                username,
+                email:'',
+                gender:''
+                
+
+            });
+
+            return res.status(201).send()
+        
+            }
+            catch{
+                return res.status(500).send()
+            }
+
+        
 
     },
 
