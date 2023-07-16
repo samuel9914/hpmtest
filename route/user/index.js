@@ -4,6 +4,7 @@ const {userController} = require('../../controller');
 const passport = require('passport');
 
 const initializePassport = require('../../passport-config');
+const { updateProfile } = require('../../controller/userController');
 
    initializePassport(
   passport,
@@ -47,6 +48,10 @@ router.post('/register/',checkNotAuthenticated,userController.create);
   failureFlash: true
 }));  
 
+router.get('/profiles',checkAuthenticated,userController.getAllProfiles);
+router.put('/updateProfile',checkAuthenticated,userController.updateProfile );
+
+router.post('/updateProfile',checkAuthenticated,userController.updateProfile );
 
 //router.post('/login/',userController.login);
 //router.post('./login',passport.authenticate('local'))

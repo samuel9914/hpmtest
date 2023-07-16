@@ -14,6 +14,6 @@ const db  ={};
 
 db.sequilize  = sequilize;
 db.models = {};
-db.models.User = require('./user')(sequilize,Sequelize.DataTypes)
-
+db.models.User = require('./user')(sequilize,Sequelize.DataTypes);
+db.models.UserProfile = require('./userProfile')(sequilize,Sequelize.DataTypes);
 module.exports = db;
