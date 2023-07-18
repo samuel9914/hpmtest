@@ -1,0 +1,66 @@
+GET http://localhost:3000/users
+
+###
+GET http://localhost:3000/users/profiles
+
+
+###
+
+POST http://localhost:3000/users/register
+Content-Type:  application/json
+
+{
+    "username":"ridho",
+    "password":"mapres"
+}
+
+### TIDAK ADA HURUF BESAR
+POST http://localhost:3000/users/register
+Content-Type:  application/json
+
+{
+    "username":"tanpaHurufBesar",
+    "password":"awdawdawdawd"
+}
+
+
+#### TIDAK ADA HURUF KECIL
+POST http://localhost:3000/users/register
+Content-Type:  application/json
+
+{
+    "username":"tanpaHurufKecil",
+    "password":"AWDAWDAWD"
+}
+
+#### BERHASIL REGISTRASI
+POST http://localhost:3000/users/register
+Content-Type:  application/json
+
+{
+    "username":"2adaHurufBesarDanKecil",
+    "password":"AWDAWDawdawd123"
+}
+
+
+###
+
+
+POST http://localhost:3000/login
+
+Content-Type:  application/json
+{
+    "username":"2adaHurufBesarDanKecil",
+    "password":"AWDAWDawdawd123"
+}
+
+###harusnya berhasil
+PUT http://localhost:3000/users/updateProfile
+Content-Type:  application/json
+
+{
+    "username":"adaHurufBesarDanKecil",
+    "email":"mapres",
+    "gender":"male",
+    "name": "test"
+}
