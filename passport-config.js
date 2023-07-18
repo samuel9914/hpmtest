@@ -5,15 +5,17 @@ const bcrypt = require('bcrypt');
 function  initialize(passport) {
 
 
-  const getUserById = async (id,done)=>{
+  const getUserById = async (id)=>{
     try {
       const user = await User.findOne({where : {id: id}});
       if (user == null) {
-        done(null, false, { message: 'No user with that username' })
+        return false;
       }
+      
+      return user;
     }
     catch(e){
-      done(null,false,{message: e.message});
+      return e;
     }
 
   }
