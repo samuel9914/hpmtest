@@ -13,4 +13,6 @@ prerequisite: node.js, mysql, postman(optional),visual studio code(optional)
     username = admin
     password = sangataman
 
+-   refer to this link for further details 
+    https://documenter.getpostman.com/view/9559377/2s946h7s4s
 
