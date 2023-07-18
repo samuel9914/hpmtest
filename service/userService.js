@@ -135,7 +135,7 @@ module.exports = (passport) =>{
 
     //response login ketika berhasil
     login: async(req,res,next) => {
-        console.log("ada didalam login");
+       
       
         try{ 
             passport.authenticate('local', function(err, user, info) {
