@@ -7,22 +7,7 @@ module.exports = (passport) =>{
     let userService = {
   
 
-    //mengambil semua informasi user dan password yang ada di database
-    getAllUsers: async(req,res)=> {
-
-        users = await User.findAll({});
-        return res.status(200).send(users);
-
-    },
-
-
-    //mengambil semua profil yang ada didatabase
-    getAllProfiles: async(req,res)=> {
-
-        profiles = await UserProfile.findAll({});
-        return res.status(200).send(profiles);
-
-    },
+    
 
     //mekanisme update profil
     updateProfile: async(req,res)=> {
@@ -114,7 +99,7 @@ module.exports = (passport) =>{
             return res.status(422).send("username dan password harus berbeda");
         }
       
-        //pengecekan duplikasi username
+        //pengecekan duplikasi username 
         const user = await User.findOne({where : {username: username}})
         if(user != null){
             return res.status(409).send("username sudah digunakan");
