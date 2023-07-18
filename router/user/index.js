@@ -26,17 +26,12 @@ function checkNotAuthenticated(req, res, next) {
 
 
 
-//routing entry endpoint 
-router.get('/',checkAuthenticated,userController(passport).getAllUsers);
 
 //routing untuk registrasi
 router.post('/register/',checkNotAuthenticated,userController(passport).register);
  
 //routing untuk login
 router.post('/login',checkNotAuthenticated, userController(passport).login );  
-  
-//routing untuk mengambil seluruh data profil
-router.get('/profiles',checkAuthenticated,userController(passport).getAllProfiles);
 
 //routing untuk update profile
 router.put('/updateProfile',checkAuthenticated,userController(passport).updateProfile );
