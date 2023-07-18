@@ -7,23 +7,27 @@ const app = express();
 const bcrypt = require('bcrypt');
 const sequelize = require("sequelize");
 const db = require('./config');
-const passport = require('passport');
 const flash = require('express-flash');
 const session = require('express-session');
-const userRouter = require('./router/user');
+
 
 const {models:{User}} = require('./config');
 
-/* const initializePassport = require('./passport-config');
+const basicAuth = require('express-basic-auth')
+const bodyParser = require('body-parser');
 
-   initializePassport(
-  passport,
-  username => users.find(user => user.username === username),
-  id => users.find(user => user.id === id)
-  //async username =>  await User.findOne({where : {username: username}})
-) 
-  */
-const users = [];
+const passport = require('passport');
+
+require('./passport-config')(passport);
+
+
+
+app.use(basicAuth({
+  users: { 'admin': 'sangataman' }
+}));
+
+
+app.use(bodyParser.json()); // support json encoded bodies
 
 app.use(express.json());
 app.use(flash());
@@ -33,25 +37,16 @@ app.use(session({
   saveUninitialized: false
 }));
 
-
-/* 
+//inisiasi objek passport ke request yang masuk
 app.use(passport.initialize());
-app.use(passport.session()); */
+//middleware untuk authentikasi menggunakan session
+app.use(passport.session());
 
+//sync db
 (async () =>{
   await db.sequilize.sync();
 })();
-
-//endpoint user
-/*  app.post('/login', passport.authenticate('local',
-                                                              {
-                                                                successRedirect: '/',
-                                                                failureRedirect: '/login',
-                                                                failureFlash: true
-                                                              }));  */
+let userRouter = require('./router/user')(app,passport);
 app.use('/users',userRouter);
-
-
-
 
 app.listen(3000)

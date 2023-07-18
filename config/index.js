@@ -2,6 +2,7 @@
 const dbConfig = require('../credential/database/mysql.js');
 const Sequelize = require('sequelize');
 
+//koneksi ke db
 const sequilize = new Sequelize(dbConfig.DATABASE,
                                 dbConfig.USER,
                                 dbConfig.PASSWORD,

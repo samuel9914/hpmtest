@@ -1,59 +1,48 @@
+//entry point route
+
+module.exports= (app,passport)=>{
 const express = require('express');
 const router = express.Router();
 const {userController} = require('../../service');
-const passport = require('passport');
+const basicAuth = require('express-basic-auth')
 
-const initializePassport = require('../../passport-config');
-const { updateProfile } = require('../../service/userService');
-
-   initializePassport(
-  passport,
-  username => users.find(user => user.username === username),
-  id => users.find(user => user.id === id)
-  //async username =>  await User.findOne({where : {username: username}})
-) 
-
-
-
+//fungsi untuk validasi user yang sudah terautentikasi
 function checkAuthenticated(req, res, next) {
-    console.log('luar if')
     if (req.isAuthenticated()) {
-      console.log('dalam if');
-      return next()
+      return next();
     }
-    console.log('redirected');
-    res.redirect('/login')
+    return res.status(401).send("Belum terautentikasi");
 }
-  
+ 
+//fungsi untuk validasi user belum terautentikasi
 function checkNotAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
-      return res.redirect('/')
+      return res.status(200).send("Sudah terautentikasi");
     }
-    next()
+    console.log("belum terautentikasi");
+    next();
 }
 
 
-router.use(passport.initialize());
-router.use(passport.session());
 
-router.get('/',checkAuthenticated,userController.getAllUsers);
 
-router.post('/register/',checkNotAuthenticated,userController.create);
+//routing entry endpoint 
+router.get('/',checkAuthenticated,userController(passport).getAllUsers);
+
+//routing untuk registrasi
+router.post('/register/',checkNotAuthenticated,userController(passport).register);
  
+//routing untuk login
+router.post('/login',checkNotAuthenticated, userController(passport).login );  
+  
+//routing untuk mengambil seluruh data profil
+router.get('/profiles',checkAuthenticated,userController(passport).getAllProfiles);
 
- router.post('/login', passport.authenticate('local',
-{
-  successRedirect: '/',
-  failureRedirect: '/login',
-  failureFlash: true
-}));  
+//routing untuk update profile
+router.put('/updateProfile',checkAuthenticated,userController(passport).updateProfile );
+app.use(router);
+return router;
+}
 
-router.get('/profiles',checkAuthenticated,userController.getAllProfiles);
-router.put('/updateProfile',checkAuthenticated,userController.updateProfile );
 
-router.post('/updateProfile',checkAuthenticated,userController.updateProfile );
 
-//router.post('/login/',userController.login);
-//router.post('./login',passport.authenticate('local'))
-
-module.exports=router;

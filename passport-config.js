@@ -1,42 +1,57 @@
 const {models:{User}} = require('./config');
-
-
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
 
- function  initialize(passport,getUserByUsername,getUserById) {
-  const authenticateUser = async (username, password, done) => {
-    //const user = getUserByUsername(username);
-    const user = await User.findOne({where : {username: username}})
+function  initialize(passport) {
 
-    if (user == null) {
-      return done(null, false, { message: 'No user with that email' })
+
+  const getUserById = async (id,done)=>{
+    try {
+      const user = await User.findOne({where : {id: id}});
+      if (user == null) {
+        done(null, false, { message: 'No user with that username' })
+      }
+    }
+    catch(e){
+      done(null,false,{message: e.message});
     }
 
+  }
+
+  const authenticateUser = async (username, password, done) => { 
+    console.log('masuk authUser');
+    console.log(username,password); 
     try {
-      
-      
-      if (await bcrypt.compare(password, user.password)) {
-     // if (true) {
-        
-        return done(null, user,{ message: 'Login successful ' })
-      } else {
-        return done(null, false, { message: 'Password incorrect' })
+      const user = await User.findOne({where : {username: username}});
+      if (user == null) {
+        return done(null, false, { message: 'Username tidak ditemukan' })
       }
-    } catch (e) {
-      return done(e)
+        
+      if (await bcrypt.compare(password, user.password)) {
+        console.log("login success");
+        return done(null, user,{ message: 'Login sukses' });
+        
+      } 
+      else {
+        return done(null, false, { message: 'Password salah' })
+      }
+
+    } 
+    catch (e) {
+        return done(e)
     }
   }
- 
-  passport.use(new LocalStrategy({ usernameField: 'username' }, authenticateUser))
   
-  console.log('done');
-  passport.serializeUser((user, done) => done(null, user.id))
-
+  passport.use(new LocalStrategy( authenticateUser));
+ 
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  })
   
   passport.deserializeUser((id, done) => {
-    return done(null,true)
+    done(null,getUserById(id));
   })
+
 }
 
-module.exports = initialize
+module.exports = initialize;
