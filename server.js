@@ -9,6 +9,7 @@ const sequelize = require("sequelize");
 const db = require('./config');
 const flash = require('express-flash');
 const session = require('express-session');
+const rateLimit = require('express-rate-limit')
 
 
 const {models:{User}} = require('./config');
@@ -21,6 +22,17 @@ const passport = require('passport');
 require('./passport-config')(passport);
 
 
+
+//konfigurasi limiter 100 request per 15 menit
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, 
+	max: 100, 
+	standardHeaders: true, 
+	legacyHeaders: false, 
+})
+
+//apply limitasi request
+app.use(limiter)
 
 app.use(basicAuth({
   users: { 'admin': 'sangataman' }
