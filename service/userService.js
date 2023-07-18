@@ -68,13 +68,15 @@ module.exports = (passport) =>{
 
       
         try{
+
+          
             //melakukan update didatabase untuk username yang diberikan
             const aa = await UserProfile.update(
                 {    email : req.body.email,
                      name : req.body.name,
                      gender : req.body.gender  },
                      {
-                         where : {username: req.body.username}
+                         where : {id: req.session.passport.user}
                     }
              )
             res.status(201).send("berhasil update profil");
@@ -152,7 +154,7 @@ module.exports = (passport) =>{
       
         try{ 
             passport.authenticate('local', function(err, user, info) {
-                console.log(req.body);
+          
                 if (err) { return next(err); } //error exception
         
                 //cek user terisi atau tidak, terisi false bila gagal
