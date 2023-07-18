@@ -1,5 +1,6 @@
-module.exports = (sequilize, DataTypes) =>{
+//model data userProfile
 
+module.exports = (sequilize, DataTypes) =>{
     const UserProfiles = sequilize.define(  'userProfile',
                                     {   name:DataTypes.STRING,
                                         username: DataTypes.STRING,
