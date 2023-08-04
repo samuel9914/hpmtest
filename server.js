@@ -26,7 +26,7 @@ require('./passport-config')(passport);
 //konfigurasi limiter 100 request per 15 menit
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, 
-	max: 100, 
+	max: 50, 
 	standardHeaders: true, 
 	legacyHeaders: false, 
 })
@@ -58,6 +58,8 @@ app.use(passport.session());
 (async () =>{
   await db.sequilize.sync();
 })();
+
+
 let userRouter = require('./router/user')(app,passport);
 app.use('/users',userRouter);
 
