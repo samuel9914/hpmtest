@@ -1,6 +1,7 @@
-const {models:{User}} = require('./config');
+const {models:{User}} = require('.');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt');
+
 
 function  initialize(passport) {
 
@@ -15,14 +16,13 @@ function  initialize(passport) {
       return user;
     }
     catch(e){
-      return e;
+      res.status(500).send(e.errors[0].message);
     }
 
   }
 
   const authenticateUser = async (username, password, done) => { 
-    console.log('masuk authUser');
-    console.log(username,password); 
+
     try {
       const user = await User.findOne({where : {username: username}});
       if (user == null) {
@@ -30,7 +30,7 @@ function  initialize(passport) {
       }
         
       if (await bcrypt.compare(password, user.password)) {
-        console.log("login success");
+      
         return done(null, user,{ message: 'Login sukses' });
         
       } 
