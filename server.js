@@ -10,26 +10,17 @@ const db = require('./config');
 const flash = require('express-flash');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit')
-
-
+const limiterConfig = require('./config/rateLimiterConfig.js')
 const {models:{User}} = require('./config');
-
 const basicAuth = require('express-basic-auth')
 const bodyParser = require('body-parser');
-
 const passport = require('passport');
-
-require('./passport-config')(passport);
-
+require('./config/passport-config')(passport);
 
 
-//konfigurasi limiter 100 request per 15 menit
-const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000, 
-	max: 50, 
-	standardHeaders: true, 
-	legacyHeaders: false, 
-})
+
+//konfigurasi limiter 50 request per 15 menit
+const limiter = rateLimit(limiterConfig)
 
 //apply limitasi request
 app.use(limiter)
@@ -60,7 +51,14 @@ app.use(passport.session());
 })();
 
 
-let userRouter = require('./router/user')(app,passport);
+let userRouter = require('./router/user')(app);
+
+//memasukan object passport ke object req yang mencoba mengakses path users
+app.use('/users',(req, res, next)=> {
+                                      req.passport = passport;
+                                      next();
+                                    }          
+      )
 app.use('/users',userRouter);
 
 app.listen(3000)
