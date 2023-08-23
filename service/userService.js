@@ -37,7 +37,8 @@ const userService = {
     },
 
     //mekanisme membuat user baru
-    register: async(req,res) => {
+    register: async (req, res) => {
+      const { username, password } = req.body;
 
        
         registerValidator.isValid(req,res);
@@ -85,11 +86,12 @@ const userService = {
     //response login ketika berhasil
     login: async(req,res,next) => {
        
-         try{ 
-            req.passport.authenticate('local', function(err, user, info) {
+      
+        try{ 
+            passport.authenticate('local', function(err, user, info) {
           
                 if (err) { return next(err); } //error exception
-
+        
                 //cek user terisi atau tidak, terisi false bila gagal
                 if (!user) {
                     return res.status(401).json(info); 
@@ -104,7 +106,8 @@ const userService = {
         }
         catch(e){
             res.status(500).send(e);
-        } 
+        }
       }
     }
- module.exports = userService;
+    return userService;
+}
