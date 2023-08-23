@@ -1,173 +1,113 @@
-const {
-  models: { User, UserProfile },
-} = require("../config");
-const bcrypt = require("bcrypt");
+const {models:{User}} = require('../config');
+const bcrypt = require('bcrypt');
+const registerValidator = require('./userInputValidation/registerValidation');
+const updateProfileValidator = require('./userInputValidation/updateProfileValidation.js');
 
-module.exports = (passport) => {
-  let userService = {
+const userService = {
+  
     //mekanisme update profil
-    updateProfile: async (req, res) => {
-      // Convert all incoming data to uppercase. It may not be necessary to do this and might confuse users
-      // as case sensitivity matters for email addresses in most cases. Also, this decision to transform user's input
-      // should be done at frontend or decided based on your database design.
-      const email = req.body.email.toUpperCase();
-      const name = req.body.name.toUpperCase();
-      const gender = req.body.gender.toUpperCase();
+    updateProfile : async(req,res)=> {
+        
+        
 
-      // You are using plain string comparison. It's better to use a dedicated library such as 'validator' or 'yup' which
-      // has many useful methods for data validation including isEmail, isEmpty, isLength, etc.
+        updateProfileValidator.isValid(req,res);
+        const email = req.body.email.trim().escape();
+        const name = req.body.name.trim().escape();
+        const gender = req.body.gender.trim().escape().toUpperCase();
+        try{
 
-      //validasi email terisi atau tidak
-      if (email == null || email == "") {
-        return res.status(409).send("Email tidak boleh kosong");
-      }
-      //validasi format email
-      else if (
-        /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email) == false
-      ) {
-        return res.status(422).send("Email yang diberikan tidak sesuai format");
-      }
-      //validasi panjang field email
-      else if (email.length > 255) {
-        return res.status(422).send("email harus kurang dari 255 karakter");
-      }
+            console.log(req.session.passport.user);
+            //melakukan update didatabase untuk username yang diberikan
+            await User.update(
+                {    email : email,
+                     name : name,
+                     gender : gender  },
+                     {
+                         where : {id: req.session.passport.user}
+                    }
+             )
+            res.status(201).send("berhasil update profil");
+        }
+        catch(e){
+            res.status(500).send(e);
+        }
+        
 
-      // These if conditions could be organized into a separate validation function to avoid code repetition
-      // and to make the code cleaner.
-      //validasi nama terisi atau tidak
-      if (name == null || name == "") {
-        return res.status(409).send("nama tidak boleh kosong");
-      }
-      //validasi panjang field nama
-      else if (name.length > 255) {
-        return res.status(422).send("nama harus kurang dari 255 karakter");
-      }
 
-      // Instead of checking for both "MALE" and "FEMALE", it might be easier to
-      // make a list of accepted gender inputs and check if the provided gender is included in that list.
-      //validasi field gender terisi atau tidak
-      if (gender == null || gender == "") {
-        return res.status(409).send("gender tidak boleh kosong");
-      }
-
-      //limitasi input untuk field gender
-      if (
-        gender.toUpperCase() != "MALE" &&
-        req.body.gender.toUpperCase() != "FEMALE"
-      ) {
-        return res.status(422).send("gender harus male atau female");
-      }
-
-      try {
-        //melakukan update didatabase untuk username yang diberikan
-
-        // In Sequelize, the update method returns the number of affected rows, not the updated row itself.
-        // It seems you are not using the returned result (const aa), so it can be removed.
-        // variable naming could be improved.
-        const aa = await UserProfile.update(
-          {
-            email: req.body.email,
-            name: req.body.name,
-            gender: req.body.gender,
-          },
-          {
-            where: { id: req.session.passport.user },
-          }
-        );
-        res.status(201).send("berhasil update profil");
-      } catch (e) {
-        res.status(500).send(e);
-      }
     },
 
     //mekanisme membuat user baru
     register: async (req, res) => {
       const { username, password } = req.body;
 
-      //Validation is good but there are some issues:
-      //- You are trimming the username and password after checking if they are null or empty. It would be better to trim them first.
-      //- You should also check if the username and password are strings before trying to trim them.
-      //- While checking for uppercase, lowercase, and digits in password is a good idea, it may be better to inform users about these requirements beforehand.
-      //- Also, the condition `password == username` might not be necessary.
+       
+        registerValidator.isValid(req,res);
+        updateProfileValidator.isValid(req,res);
 
-      //Validasi input username dan password saat registrasi
-      if (
-        !username ||
-        !password ||
-        username.trim() == "" ||
-        password.trim() == ""
-      ) {
-        return res.status(400).send("username dan password tidak boleh kosong");
-      } else if (password.length <= 8) {
-        return res.status(422).send("password harus lebih dari 8 karakter");
-      } else if (/^[A-Z]+$/.test(password)) {
-        return res.status(422).send("password harus mengandung huruf kecil");
-      } else if (/^[a-z]+$/.test(password)) {
-        return res.status(422).send("password harus mengandung huruf kapital");
-      } else if (!/\d/.test(password)) {
-        return res.status(422).send("password harus mengandung angka");
-      } else if (password == username) {
-        return res.status(422).send("username dan password harus berbeda");
-      }
+        const username = req.body.username.trim().escape();
+        const password = req.body.password.trim().escape();
+        const email = req.body.email.trim().escape();
+        const name = req.body.name.trim().escape();
+        const gender = req.body.gender.trim().escape().toUpperCase();
+        
 
-      // Username duplication check is great. But the error message could be more descriptive like "The username is already taken."
-      //pengecekan duplikasi username
-      const user = await User.findOne({ where: { username: username } });
-      if (user != null) {
-        return res.status(409).send("username sudah digunakan");
-      }
+     
+        //pengecekan duplikasi username 
+        const user = await User.findOne({where : {username: username}})
 
-      try {
-        // You are hardcoding the saltRounds to 10. You can consider making it a configuration or an environment variable.
-        const salt = await bcrypt.genSalt(10); //generate salt untuk hashing password
-        const hashedPassword = await bcrypt.hash(password, salt);
+        if(user != null){
+            return res.status(409).send("username sudah digunakan");
+        }
 
-        //membuat entry baru meenggunakan hashed password
-        await User.create({
-          username,
-          password: hashedPassword,
-        });
+        try {
+            
+            const salt = await bcrypt.genSalt(Number(process.env.SALT_LENGTH)) //generate salt untuk hashing password
+        
+            const hashedPassword = await bcrypt.hash(password,salt) 
+    
+            //membuat entry baru meenggunakan hashed password
+             await User.create({
+                username,
+                password: hashedPassword,
+                name:name,
+                email:email,
+                gender:gender
+            });
+         
 
-        // Creating user and user profile together. That's good. However, you should handle the situation
-        // where one operation succeeds but the other fails.
-        //membuat entry pada table UserProfile dengan username yg sama,
-        await UserProfile.create({
-          name: "",
-          username,
-          email: "",
-          gender: "",
-        });
-
-        return res.status(201).send("Akun berhasil dibuat");
-      } catch {
-        // You might want to include the error message from catch in the response or at least log it,
-        // otherwise, it would be hard to debug in case of errors.
-        return res.status(500).send();
-      }
+            return res.status(201).send("Akun berhasil dibuat");
+        
+        }
+        catch(e){
+            return res.status(500).send(e.errors[0].message);
+        }
     },
 
     //response login ketika berhasil
-    login: async (req, res, next) => {
-      try {
-        passport.authenticate("local", function (err, user, info) {
-          if (err) {
-            return next(err);
-          } //error exception
-
-          //cek user terisi atau tidak, terisi false bila gagal
-          if (!user) {
-            return res.status(401).json(info);
-          } else {
-            //maintain session
-            req.logIn(user, function () {
-              return res.status(200).send("login sukses");
-            });
-          }
-        })(req, res, next);
-      } catch (e) {
-        res.status(500).send(e);
+    login: async(req,res,next) => {
+       
+      
+        try{ 
+            passport.authenticate('local', function(err, user, info) {
+          
+                if (err) { return next(err); } //error exception
+        
+                //cek user terisi atau tidak, terisi false bila gagal
+                if (!user) {
+                    return res.status(401).json(info); 
+                } else {
+                    //maintain session
+                    req.logIn(user, function() {
+                        
+                        return res.status(200).send("login sukses");
+                    })
+                }    
+        })(req,res,next);
+        }
+        catch(e){
+            res.status(500).send(e);
+        }
       }
-    },
-  };
-  return userService;
-};
+    }
+    return userService;
+}

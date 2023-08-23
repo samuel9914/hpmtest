@@ -1,5 +1,24 @@
 //entry point route
 
+<<<<<<< HEAD
+module.exports= (app)=>{
+  const express = require('express');
+  const router = express.Router();
+  const {userController} = require('../../service');
+  const authCheck = require('./authCheck');
+
+  //routing untuk registrasi
+  router.post('/register/',authCheck.checkNotAuthenticated,userController.register);
+  
+  //routing untuk login
+  router.post('/login',authCheck.checkNotAuthenticated, userController.login );  
+
+  //routing untuk update profile
+  router.put('/updateProfile',authCheck.checkAuthenticated,userController.updateProfile );
+  app.use(router);
+  return router;
+}
+=======
 // remove unsed imports and dependencies
 module.exports = (app, passport) => {
   const express = require("express");
@@ -23,6 +42,7 @@ module.exports = (app, passport) => {
     console.log("belum terautentikasi");
     next();
   }
+>>>>>>> master
 
   //routing untuk registrasi
   router.post(
@@ -35,6 +55,11 @@ module.exports = (app, passport) => {
 
   //routing untuk login
   router.post("/login", checkNotAuthenticated, userController(passport).login);
+  //routing untuk registrasi
+  router.post('/register/',authCheck.checkNotAuthenticated,userController.register);
+  
+  //routing untuk login
+  router.post('/login',authCheck.checkNotAuthenticated, userController.login );  
 
   //routing untuk update profile
   router.put(
@@ -45,3 +70,11 @@ module.exports = (app, passport) => {
   app.use(router);
   return router;
 };
+  //routing untuk update profile
+  router.put('/updateProfile',authCheck.checkAuthenticated,userController.updateProfile );
+  app.use(router);
+  return router;
+}
+
+
+

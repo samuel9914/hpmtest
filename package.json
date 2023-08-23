@@ -25,6 +25,7 @@
     "express-flash": "^0.0.2",
     "express-rate-limit": "^6.7.1",
     "express-session": "^1.17.3",
+    "express-validator": "^7.0.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.5.1",
     "passport": "^0.6.0",
@@ -32,7 +33,8 @@
     "passport-local": "^1.0.0",
     "sequelize": "^6.32.1",
     "sqlite3": "^5.1.6",
-    "twilio": "^4.13.0"
+    "twilio": "^4.13.0",
+    "validator": "^13.11.0"
   },
   "devDependencies": {
     "dotenv": "^16.3.1",
