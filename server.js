@@ -4,45 +4,53 @@ if (process.env.NODE_ENV !== 'production') {
 
 const express = require('express');
 const app = express();
-const bcrypt = require('bcrypt');
-const sequelize = require("sequelize");
 const db = require('./config');
 const flash = require('express-flash');
 const session = require('express-session');
-const rateLimit = require('express-rate-limit')
-const limiterConfig = require('./config/rateLimiterConfig.js')
-const {models:{User}} = require('./config');
 const basicAuth = require('express-basic-auth')
 const bodyParser = require('body-parser');
 const passport = require('passport');
+const helmet = require('helmet');
+const https = require("https");
+const fs = require("fs");
+
+
 require('./config/passport-config')(passport);
 
 
 
-//konfigurasi limiter 50 request per 15 menit
-const limiter = rateLimit(limiterConfig)
 
-//apply limitasi request
-app.use(limiter)
+//apply helmet for setting up proper HTTP headers
+app.use(helmet())
+//reducing fingerprinting
+app.disable('x-powered-by')
 
 app.use(basicAuth({
-  users: { 'admin': 'sangataman' }
+  users: { 'admin': process.env.basicAuthPassword }
 }));
 
-
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 
 app.use(express.json());
 app.use(flash());
+
+//setting up session
+const expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 app.use(session({
+  name:process.env.SESSION_NAME,
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie:{
+    secure: true,
+    httpOnly: true,
+    expires: expiryDate
+  }
 }));
 
-//inisiasi objek passport ke request yang masuk
+//initiating object passport
 app.use(passport.initialize());
-//middleware untuk authentikasi menggunakan session
 app.use(passport.session());
 
 //sync db
@@ -53,12 +61,26 @@ app.use(passport.session());
 
 let userRouter = require('./router/user')(app);
 
-//memasukan object passport ke object req yang mencoba mengakses path users
+//injecting passport to req object
 app.use('/users',(req, res, next)=> {
                                       req.passport = passport;
                                       next();
-                                    }          
-      )
+                                    })
 app.use('/users',userRouter);
 
-app.listen(3000)
+//custom notfound handler
+app.use((req, res, next) => {
+  res.status(404).send("Not found!");
+})
+
+//setting up https option
+const options = {
+  key: fs.readFileSync("server.key"),
+  cert: fs.readFileSync("server.cert"),
+};
+
+https.createServer(options, app)
+.listen(3000, function (req, res) {
+  console.log("Server started at port 3000");
+});
+//app.listen(3000)

@@ -10,7 +10,7 @@ module.exports = (sequilize, DataTypes) =>{
                                             validate:{
                                                 notEmpty:{
                                                     arg:true,
-                                                    msg:"required"
+                                                    msg:"username required"
                                                 },
                                                 len:{
                                                     args:[6,32],
@@ -27,7 +27,7 @@ module.exports = (sequilize, DataTypes) =>{
                                             validate:{
                                                 notEmpty:{
                                                     arg:true,
-                                                    msg:"required"
+                                                    msg:"password required"
                                                 },
                                                 len:{
                                                     args:[8],
@@ -65,7 +65,7 @@ module.exports = (sequilize, DataTypes) =>{
                                                 },
                                                 is:{
                                                     args:/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/i,
-                                                    msg:"Does not match standart email format"
+                                                    msg:"Does not match standard email format"
                                                 }
 
                                             }
