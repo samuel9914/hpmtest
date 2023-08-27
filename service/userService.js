@@ -1,27 +1,24 @@
 const {models:{User}} = require('../config');
 const bcrypt = require('bcrypt');
-const registerValidator = require('./userInputValidation/registerValidation');
-const updateProfileValidator = require('./userInputValidation/updateProfileValidation.js');
+const { matchedData, validationResult } = require('express-validator');
 
 const userService = {
-  
-    //mekanisme update profil
+    //update profile mechanism
     updateProfile : async(req,res)=> {
         
-        
-
-        updateProfileValidator.isValid(req,res);
-        const email = req.body.email.trim().escape();
-        const name = req.body.name.trim().escape();
-        const gender = req.body.gender.trim().escape().toUpperCase();
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
+        const userData = matchedData(req);
         try{
 
-            console.log(req.session.passport.user);
-            //melakukan update didatabase untuk username yang diberikan
+          
+            //updating profile for the given username
             await User.update(
-                {    email : email,
-                     name : name,
-                     gender : gender  },
+                {    email : userData.email,
+                     name :userData.name,
+                     gender : userData.gender  },
                      {
                          where : {id: req.session.passport.user}
                     }
@@ -31,29 +28,21 @@ const userService = {
         catch(e){
             res.status(500).send(e);
         }
-        
-
 
     },
 
-    //mekanisme membuat user baru
+    //create user mechanism
     register: async (req, res) => {
-      const { username, password } = req.body;
 
-       
-        registerValidator.isValid(req,res);
-        updateProfileValidator.isValid(req,res);
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).json({ errors: errors.array() });
+        }
 
-        const username = req.body.username.trim().escape();
-        const password = req.body.password.trim().escape();
-        const email = req.body.email.trim().escape();
-        const name = req.body.name.trim().escape();
-        const gender = req.body.gender.trim().escape().toUpperCase();
+        const userData = matchedData(req);
         
-
-     
-        //pengecekan duplikasi username 
-        const user = await User.findOne({where : {username: username}})
+        //username duplication check
+        const user = await User.findOne({where : {username: userData.username}})
 
         if(user != null){
             return res.status(409).send("username sudah digunakan");
@@ -61,38 +50,33 @@ const userService = {
 
         try {
             
-            const salt = await bcrypt.genSalt(Number(process.env.SALT_LENGTH)) //generate salt untuk hashing password
+            const salt = await bcrypt.genSalt(Number(process.env.SALT_LENGTH)) //generate salt for password hashing
         
-            const hashedPassword = await bcrypt.hash(password,salt) 
-    
-            //membuat entry baru meenggunakan hashed password
+            const hashedPassword = await bcrypt.hash(userData.password,salt) 
+          
+            //new entry with hashed password
              await User.create({
-                username,
+                username:userData.username,
                 password: hashedPassword,
-                name:name,
-                email:email,
-                gender:gender
+                name:userData.name,
+                email:userData.email,
+                gender:userData.gender
             });
-         
-
-            return res.status(201).send("Akun berhasil dibuat");
+            return res.status(201).send("Account created");
         
         }
         catch(e){
-            return res.status(500).send(e.errors[0].message);
+            return res.status(500).send(e);
         }
     },
 
-    //response login ketika berhasil
+    //login mechanism
     login: async(req,res,next) => {
-       
-      
+    
         try{ 
-            passport.authenticate('local', function(err, user, info) {
-          
-                if (err) { return next(err); } //error exception
-        
-                //cek user terisi atau tidak, terisi false bila gagal
+            req.passport.authenticate('local', function(err, user, info) {
+                if (err) {  return next(err); } //error exception
+                //if authentication failed user object value is false
                 if (!user) {
                     return res.status(401).json(info); 
                 } else {
@@ -109,5 +93,4 @@ const userService = {
         }
       }
     }
-    return userService;
-}
+    module.exports = userService
