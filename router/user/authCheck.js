@@ -1,18 +1,18 @@
 
 
 const authCheck = {
-    //fungsi untuk validasi user yang sudah terautentikasi
+    //validating authenticated user
     checkAuthenticated: (req, res, next) =>{
         if (req.isAuthenticated()) {
           return next();
         }
-        return res.status(401).send("Belum terautentikasi");
+        return res.status(401).send("Not Authenticated");
     },
      
-    //fungsi untuk validasi user yang belum terautentikasi
+    //validating not authenticated user
     checkNotAuthenticated: (req, res, next)=> {
         if (req.isAuthenticated()) {
-          return res.status(200).send("Sudah terautentikasi");
+          return res.status(200).send("Authenticated");
         }
     
         next();

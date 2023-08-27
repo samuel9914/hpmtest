@@ -16,7 +16,7 @@ function  initialize(passport) {
       return user;
     }
     catch(e){
-      res.status(500).send(e.errors[0].message);
+       return e;
     }
 
   }
@@ -26,16 +26,16 @@ function  initialize(passport) {
     try {
       const user = await User.findOne({where : {username: username}});
       if (user == null) {
-        return done(null, false, { message: 'Username tidak ditemukan' })
+        return done(null, false, { message: 'Username not found' })
       }
         
       if (await bcrypt.compare(password, user.password)) {
       
-        return done(null, user,{ message: 'Login sukses' });
+        return done(null, user,{ message: 'Login success' });
         
       } 
       else {
-        return done(null, false, { message: 'Password salah' })
+        return done(null, false, { message: 'Wrong password' })
       }
 
     } 
